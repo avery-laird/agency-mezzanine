@@ -68,14 +68,12 @@
                     <ul class="timeline">
 	    {% endif %}
 			<li class="{% cycle '' 'timeline-inverted' %}">
-			{#{% editable event.image %}#}
-			    <div class="timeline-image">
+                            <div class="timeline-image">
                                 <img class="img-circle img-responsive" src="{{ MEDIA_URL }}{% thumbnail event.image 200 200 %}" alt="">
                             </div>
-			{#{% endeditable %}#}
                             <div class="timeline-panel">
 			      {% editable event.header event.subheader event.content %}
-				<div class="timeline-heading">
+                                <div class="timeline-heading">
                                     <h4>{{ event.header }}</h4>
                                     <h4 class="subheading">{{ event.subheader }}</h4>
                                 </div>
