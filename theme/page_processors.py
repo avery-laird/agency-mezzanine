@@ -1,21 +1,25 @@
 from django import forms
 from django.http import HttpResponseRedirect
 from mezzanine.pages.page_processors import processor_for
-from .models import Author
+from .models import HomePage, messages
+from django.core.mail import send_mail
 
 class ContactForm(forms.Form):
-    name = forms.CharField()
-    email = forms.EmailField()
-    phone = forms.CharField()
-    
+    name = forms.CharField(widget=forms.TextInput(attrs={'placeholder':'Your Name *'}))
+    email = forms.EmailField(widget=forms.EmailInput(attrs={'placeholder':'Your Email *'}))
+    phone = forms.CharField(widget=forms.TextInput(attrs={'placeholder':'Your Phone *'}))
+    message = forms.CharField(widget=forms.Textarea(attrs={'placeholder':'Your Message *'}))    
 
-@processor_for(Author)
+@processor_for(HomePage)
 def author_form(request, page):
-    form = AuthorForm()
+    form = ContactForm()
     if request.method == "POST":
-        form = AuthorForm(request.POST)
+        form = ContactForm(request.POST)
         if form.is_valid():
             # Form processing goes here.
-            redirect = request.path + "?submitted=true"
+	    message = messages(name = form.data['name'], email = form.data['email'], phone = form.data['phone'], message = form.data['message'])
+	    message.save()
+	    # form.save()
+	    redirect = request.path
             return HttpResponseRedirect(redirect)
     return {"form": form}

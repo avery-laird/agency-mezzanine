@@ -2,19 +2,6 @@
 {% load staticfiles mezzanine_tags %}
 
 
-{% block all_content %}
-    <!-- Header -->
-    <header>
-        <div class="container">
-            <div class="intro-text">
-                <div class="intro-lead-in">{{ page.homepage.heading }}</div>
-                <div class="intro-heading">{{ page.homepage.subheading }}</div>
-                <a href="#{{ page.homepage.sections.first }}" class="page-scroll btn btn-xl">Tell Me More</a>
-            </div>
-        </div>
-    </header>
-{% endblock %}
-
 {% block sections %}
   {% if page.homepage.sections %}
     {% for section in page.homepage.sections.all %}
@@ -22,8 +9,10 @@
 	<div class="container">
 	  <div class="row">
 	    <div class="col-lg-12 text-center">
+	     {% editable section.header section.subheader %}
 	      <h2 class="section-heading">{{ section.header }}</h2>
 	      <h3 class="section-subheading text-muted">{{ section.subheader }}</h3>
+	     {% endeditable %}
 	    </div>
 	  </div>
 	<!-- BEGIN BLURBS -->
@@ -37,8 +26,10 @@
                         <i class="fa fa-circle fa-stack-2x text-primary"></i>
                         <i class="fa fa-{{ blurb.icon }} fa-stack-1x fa-inverse"></i>
                     </span>
+		    {% editable blurb.title blurb.content %}
                     <h4 class="service-heading">{{ blurb.title }}</h4>
                     <p class="text-muted">{{ blurb.content }}</p>
+		    {% endeditable %}
                 </div>
 	   {% if forloop.last %}
 	   </div>
@@ -60,8 +51,8 @@
                         <img src="{{ MEDIA_URL }}{% thumbnail item.icon 400 289 %}" class="img-responsive" alt="">
                     </a>
                     <div class="portfolio-caption">
-                        <h4>{{ item.title }}</h4>
-                       <p class="text-muted">{{ item.description }}</p>
+                        <h4>{% editable item.title %}{% endeditable %}</h4>
+                       <p class="text-muted">{% editable item.description %}{% endeditable %}</p>
                     </div>
                 </div>
 	      {% if forloop.last %}
@@ -69,17 +60,19 @@
 	      {% endif %}
 	   {% endif %}
 	{% endfor %}
-	{% if page.homepage.timeline.all %}
+	{% for event in page.homepage.timeline.all %}
+	  {% if event.section == section %}
+	    {% if forloop.first %}
             <div class="row">
                 <div class="col-lg-12">
                     <ul class="timeline">
-		      {% for event in page.homepage.timeline.all %}
-			{% if event.section == section %}
+	    {% endif %}
 			<li class="{% cycle '' 'timeline-inverted' %}">
                             <div class="timeline-image">
                                 <img class="img-circle img-responsive" src="{{ MEDIA_URL }}{% thumbnail event.image 200 200 %}" alt="">
                             </div>
                             <div class="timeline-panel">
+			      {% editable event.header event.subheader event.content %}
                                 <div class="timeline-heading">
                                     <h4>{{ event.header }}</h4>
                                     <h4 class="subheading">{{ event.subheader }}</h4>
@@ -87,10 +80,10 @@
                                 <div class="timeline-body">
                                     <p class="text-muted">{{ event.content|safe }}</p>
                                 </div>
+			      {% endeditable %}
                             </div>
                         </li>
-		      {% endif %}
-		      {% comment %}
+		      {% if forloop.last %}
                         <li class="timeline-inverted">
                             <div class="timeline-image">
                                 <h4>Be Part
@@ -98,12 +91,12 @@
                                     <br>Story!</h4>
                             </div>
                         </li>
-		       {% endcomment %}
-		      {% endfor %}
 		     </ul>
 		</div>
 	      </div>
-	{% endif %}
+	    {% endif %}
+	  {% endif %}
+   	{% endfor %}
 	{% if page.homepage.team.all %}
 	 <div class="row">
 	  {% for member in page.homepage.team.all %}
@@ -111,9 +104,10 @@
                 <div class="col-sm-4">
                     <div class="team-member">
                         <img src="{{ MEDIA_URL }}{% thumbnail member.profile_picture 225 225 %}" class="img-responsive img-circle" alt="">
-                        <h4>{{ member.name }}</h4>
-                        <p class="text-muted">{{ member.role }}</p>
-                        <ul class="list-inline social-buttons">
+                        <h4>{% editable member.name %}{% endeditable %}</h4>
+                        <p class="text-muted">{% editable member.role %}{% endeditable %}</p>
+			{% editable member.twitter_link member.facebook_link member.linkedin_link %}
+			<ul class="list-inline social-buttons">
 			  {% if member.twitter_link %}
                             <li><a href="{{ member.twitter_link }}"><i class="fa fa-twitter"></i></a>
                             </li>
@@ -126,7 +120,8 @@
                             <li><a href="{{ member.linkedin_link }}"><i class="fa fa-linkedin"></i></a>
                             </li>
 			  {% endif %}
-                        </ul>
+			</ul>
+			{% endeditable %}
                     </div>
                 </div>
 	      {% endif %}
@@ -170,8 +165,6 @@
 {% endblock %}
 
 {% block contact %}
-
-{% endblock %}
     <section id="contact">
         <div class="container">
             <div class="row">
@@ -182,7 +175,17 @@
             </div>
             <div class="row">
                 <div class="col-lg-12">
-                    <form name="sentMessage" id="contactForm" novalidate>
+	     
+		<form class="mezzanine-form" method="post"{% if form.is_multipart %} enctype="multipart/form-data"{% endif %}>
+        	  <div class="form-group">
+         	    {% fields_for form %}
+        	  </div>
+        	  <div class="form-actions">
+            	    <input class="btn btn-primary btn-xl col-md-offset-8" style="text-align:center" type="submit" value="SEND MESSAGE">
+        	  </div>
+        	</form>
+	      {% comment %}
+	       <form name="sentMessage" id="contactForm" novalidate>
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="form-group">
@@ -211,8 +214,9 @@
                             </div>
                         </div>
                     </form>
+		 {% endcomment %}
                 </div>
             </div>
         </div>
     </section>
-
+{% endblock %}

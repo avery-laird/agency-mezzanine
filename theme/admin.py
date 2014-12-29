@@ -4,7 +4,7 @@ from mezzanine.core.admin import DisplayableAdmin, DisplayableAdminForm, Tabular
 from mezzanine.pages.models import Page, RichTextPage, Link
 from mezzanine.pages.admin import PageAdmin
 from mezzanine.utils.urls import admin_url
-from theme.models import IconBlurb, HomePage, Section, Portfolio, TimeLine, Team
+from theme.models import IconBlurb, HomePage, Section, Portfolio, TimeLine, Team, messages
 
 class IconBlurbInline(TabularDynamicInlineAdmin):
     model = IconBlurb
@@ -23,9 +23,13 @@ class TeamInline(TabularDynamicInlineAdmin):
 #class SlideInline(TabularDynamicInlineAdmin):
 #    model = Slide
 
+class messagesAdmin(admin.ModelAdmin):
+    readonly_fields = ('name', 'email', 'phone', 'message')
+    list_display = ('name', 'email', 'phone')
+
 class HomePageAdmin(PageAdmin):
     inlines = (SectionInline, IconBlurbInline, PortfolioInline, TimeLineInline, TeamInline)
 
 admin.site.register(HomePage, HomePageAdmin)
-
+admin.site.register(messages, messagesAdmin)
 # Register your models here.

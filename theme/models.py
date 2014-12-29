@@ -9,6 +9,15 @@ from mezzanine.utils.models import upload_to
 # Ideally, I would refactor this code with a "subsection" model, which all of the subsections inherit from
 # that contains the homepage and section foreignkey.
 
+class messages(models.Model):
+    name = models.CharField(max_length=120)
+    email = models.CharField(max_length=140)
+    phone = models.CharField(max_length=20)
+    message = models.TextField()
+    class Meta:
+	verbose_name = _("Message")
+	verbose_name_plural = _("Messages")
+
 class HomePage(Page, RichText):
     '''
     A page representing the format of the home page
